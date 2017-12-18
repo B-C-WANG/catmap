@@ -267,18 +267,22 @@ class ReactionModel:
                     self.descriptor_space_analysis()
 
             #Save long attrs in data_file
-            for attr in dir(self):
-                if (not attr.startswith('_') and
-                        not callable(getattr(self,attr)) and
-                        attr not in self._classes):
-                    if (len(repr(getattr(self,attr))) >
-                            self._max_log_line_length):
-                        #line is too long for logfile -> put into pickle
-                        self._pickle_attrs.append(attr)
-            pickled_data = {}
-            for attr in self._pickle_attrs:
-                pickled_data[attr] = getattr(self,attr)
-            pickle.dump(pickled_data,open(self.data_file,'w'))
+
+            save_data_file = 0
+
+            if save_data_file:
+                for attr in dir(self):
+                    if (not attr.startswith('_') and
+                            not callable(getattr(self,attr)) and
+                            attr not in self._classes):
+                        if (len(repr(getattr(self,attr))) >
+                                self._max_log_line_length):
+                            #line is too long for logfile -> put into pickle
+                            self._pickle_attrs.append(attr)
+                pickled_data = {}
+                for attr in self._pickle_attrs:
+                    pickled_data[attr] = getattr(self,attr)
+                pickle.dump(pickled_data,open(self.data_file,'w'))
 
             #Make logfile
             log_txt = self._log_imports
@@ -496,7 +500,9 @@ class ReactionModel:
                     self.parse_headers += ['coverage']
                 self.parse() #Automatically parse in data.
 
-        self.load_data_file()
+
+        # do not load data file
+        #self.load_data_file()
 
         self.set_rxn_options()
 

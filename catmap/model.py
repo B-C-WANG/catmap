@@ -395,12 +395,12 @@ class ReactionModel:
                             sys.path.append(basepath)
                         sublocs = {}
                         subglobs = {}
-                        # WANG: that means, if you have the class(the parameter in setup_file, then will auto-import the class)
+
 
                         _temp = __import__(pyfile,subglobs,sublocs, [locs[var]])
                         #_temp = __import__(pyfile,globals(),sublocs, [locs[var]]) #no reason to mess with globals() unless we have to.
                         class_instance = getattr(_temp,locs[var])(self)
-                        # WANG: here self.var = class_instance
+
                         setattr(self,var,class_instance)
                     else:
                         setattr(self,var,None)

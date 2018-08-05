@@ -1,8 +1,11 @@
-from analysis_base import *
+from .analysis_base import *
 import numpy as np
 from math import log
 from catmap.functions import convert_formation_energies
-from graphviz import Digraph
+try:
+    from graphviz import Digraph
+except ImportError:
+    print('Warning! graphviz not imported.')
 from itertools import chain, product
 
 class MechanismAnalysis(MechanismPlot,ReactionModelWrapper,MapPlot):
@@ -211,7 +214,7 @@ class MechanismAnalysis(MechanismPlot,ReactionModelWrapper,MapPlot):
                             rxn = rxn*-1
                         else:
                             reverse = False
-                    self.data_dict[self.rxn_mechanisms.keys()[n]] = [self.energies,
+                    self.data_dict[list(self.rxn_mechanisms.keys())[n]] = [self.energies,
                             self.barriers]
 
                     kwargs = self.kwarg_list[n]

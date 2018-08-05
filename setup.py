@@ -37,11 +37,12 @@ requires = ['ase',
             'graphviz'
                    ]
 license = 'COPYING.txt'
-long_description = file('README.md').read()
+long_description = open('README.md').read()
 name='python-catmap'
 packages = [
            'catmap',
            'catmap.analyze',
+           'catmap.api',
            'catmap.data',
            'catmap.mappers',
            'catmap.parsers',

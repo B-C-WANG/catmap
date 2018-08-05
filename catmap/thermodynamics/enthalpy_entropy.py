@@ -295,37 +295,48 @@ class ThermoCorrections(ReactionModelWrapper):
             for key in shomate_params.keys():
                 gas_key,T_range = key.split(':')
                 T_min,T_max = [float(t) for t in T_range.split('-')]
-                if (gas == gas_key 
-                        and temperature >= T_min 
-                        and temperature <= T_max
+                if (gas == gas_key
+                        and temperature_ref >= T_min
+                        and temperature_ref <= T_max
                         ):
                     params = shomate_params[key]
-                    Cp_ref = Cp(temperature_ref,params)
-                    dH = H(temperature,params) - H(temperature_ref,params)
-                    #deltaH(298-T) = shomate(T) - shomate(298)
-                    dS = S(temperature,params)
-                    dH = (temperature_ref*Cp_ref/1000.0 + dH)*(self._kJmol2eV) #eV
-                    #dH = 298*Cp(298) + dH(298-T)
-                    dS = dS*(self._kJmol2eV/1e3) #eV/K
-                    ZPE = sum(self.frequency_dict[gas])/2.0 
-                    free_energy = ZPE +  dH - temperature*dS
+                    Cp_ref = Cp(temperature_ref, params)
+
+                elif temperature < T_min and T_min < 300:
+                    params = shomate_params[key]
+                    Cp_ref = Cp(T_min, params)
+            for key in shomate_params.keys():
+                gas_key, T_range = key.split(':')
+                T_min, T_max = [float(t) for t in T_range.split('-')]
+                if (gas == gas_key
+                            and temperature >= T_min
+                            and temperature <= T_max
+                    ):
+                    dH = H(temperature, params) - H(temperature_ref, params)
+                    #print("H param: ", params)
+                    # deltaH(298-T) = shomate(T) - shomate(298)
+                    dS = S(temperature, params)
+                    dH = (temperature_ref * Cp_ref / 1000.0 + dH) * (self._kJmol2eV)  # eV
+                    # dH = 298*Cp(298) + dH(298-T)
+                    dS = dS * (self._kJmol2eV / 1e3)  # eV/K
+                    ZPE = sum(self.frequency_dict[gas]) / 2.0
+                    free_energy = ZPE + dH - temperature * dS
                     self._zpe_dict[gas] = ZPE
                     self._enthalpy_dict[gas] = dH
                     self._entropy_dict[gas] = dS
                     thermo_dict[gas] = free_energy
                 elif temperature < T_min and T_min < 300:
                     params = shomate_params[key]
-                    Cp_ref = Cp(T_min,params)
-                    dS = S(T_min,params)
-                    dH = (temperature*Cp_ref/1000.0)*(self._kJmol2eV) #eV
-                    dS = dS*(self._kJmol2eV/1e3) #eV/K
-                    ZPE = sum(self.frequency_dict[gas])/2.0 
-                    free_energy = ZPE +  dH - temperature*dS
+                    dS = S(T_min, params)
+                    dH = (temperature * Cp_ref / 1000.0) * (self._kJmol2eV)  # eV
+                    dS = dS * (self._kJmol2eV / 1e3)  # eV/K
+                    ZPE = sum(self.frequency_dict[gas]) / 2.0
+                    free_energy = ZPE + dH - temperature * dS
                     self._zpe_dict[gas] = ZPE
                     self._enthalpy_dict[gas] = dH
                     self._entropy_dict[gas] = dS
                     thermo_dict[gas] = free_energy
-                    self.log('shomate_warning',gas=gas,T=T_min)
+                    self.log('shomate_warning', gas=gas, T=T_min)
         for key in gas_names:
             not_there = []
             if key not in thermo_dict:
